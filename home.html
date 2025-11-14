@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>OffshoreGigs — Find Work</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00C2CB',
+            secondary: '#0A2E5C', // Deep Maritime Navy
+            surface: '#ffffff',
+            background: '#F8FAFC', // Cool Gray
+            subtle: '#94A3B8',
+          },
+          boxShadow: {
+            'card': '0 4px 20px -2px rgba(10, 46, 92, 0.05)',
+            'float': '0 10px 40px -10px rgba(0, 194, 203, 0.4)',
+            'dialog': '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
+    .hide-scroll::-webkit-scrollbar { display: none; }
+    .glass-header {
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+    }
+    .bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: 80px; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 10px; height: 100%; color: #94A3B8; transition: all 0.2s; }
+    .nav-item.active { color: #00C2CB; }
+    .nav-item i { font-size: 20px; margin-bottom: 4px; }
+    .nav-item span { font-size: 11px; font-weight: 600; }
+    
+    /* --- Styles for BOTTOM SHEET (Calendar) --- */
+    .modal-backdrop-sheet { 
+      transition: opacity 0.3s ease; opacity: 0; pointer-events: none; position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; background-color: rgba(10, 46, 92, 0.5); backdrop-filter: blur(4px); 
+    }
+    .modal-backdrop-sheet.open { opacity: 1; pointer-events: auto; }
+    .modal-content-sheet { 
+      transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); background-color: #ffffff; width: 100%; max-width: 450px; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; max-height: 90vh; overflow: hidden; 
+    }
+    .modal-backdrop-sheet.open .modal-content-sheet { transform: translateY(0); }
+
+    /* --- Styles for CENTER MODAL (Project & Certs) --- */
+    .modal-backdrop-center {
+      transition: opacity 0.3s ease-out;
+      opacity: 0;
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(10, 46, 92, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop-center.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content-center {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 450px;
+      margin: 1rem;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      overflow: hidden;
+      border-radius: 1.5rem;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-out;
+    }
+    .modal-backdrop-center.open .modal-content-center {
+      transform: scale(1);
+      opacity: 1;
+    }
+    
+    .timeline-line { position: absolute; top: 0; bottom: 0; left: 24px; width: 2px; background: #E2E8F0; z-index: 0; }
+  </style>
+</head>
+
+<body class="text-gray-800 min-h-screen pb-40">
+
+  <header class="fixed top-0 left-0 right-0 z-40 glass-header">
+    <div class="px-5 pt-5 pb-3">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-white p-0.5 shadow-sm border border-gray-100">
+            <img src="https://ui-avatars.com/api/?name=H+H&background=0A2E5C&color=fff" class="rounded-full w-full h-full" alt="User" />
+          </div>
+          <div>
+            <p class="text-sm text-gray-400 font-medium uppercase tracking-wide">Welcome Back</p>
+            <div class="flex items-center gap-3">
+              <h1 class="text-xl font-bold text-secondary leading-none">Hariharan</h1>
+              <span class="flex items-center gap-1 text-sm font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                <i class="fas fa-cloud text-primary"></i> 28°C
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+           <button id="calendarBtn" class="p-2.5 rounded-full bg-white border border-gray-100 text-secondary shadow-sm hover:bg-gray-50 transition active:scale-95">
+            <i class="far fa-calendar-alt text-lg"></i>
+           </button>
+           <button id="notificationsBtn" class="relative p-2.5 rounded-full bg-white border border-gray-100 text-secondary shadow-sm hover:bg-gray-50 transition active:scale-95">
+            <i class="far fa-bell text-lg"></i>
+            <span class="absolute top-2.5 right-3 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+           </button>
+        </div>
+      </div>
+      <div class="relative shadow-sm">
+        <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+        <input type="text" placeholder="Search jobs (e.g. Welder, Medic)" 
+               class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-secondary focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder-gray-400">
+      </div>
+    </div>
+    <div class="px-5 pb-4 flex gap-2 overflow-x-auto hide-scroll">
+      <button id="filter-all" class="filter-btn whitespace-nowrap px-5 py-2 bg-secondary text-white text-sm font-bold rounded-full shadow-md">All Jobs</button>
+      <button id="filter-offshore" class="filter-btn whitespace-nowrap px-5 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-full">Offshore</button>
+      <button id="filter-onshore" class="filter-btn whitespace-nowrap px-5 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-full">Onshore</button>
+      <button id="filter-saved" class="filter-btn whitespace-nowrap px-5 py-2 bg-white border border-gray-200 text-gray-600 text-sm font-semibold rounded-full">Saved</button>
+    </div>
+  </header>
+
+  <main class="px-5 space-y-8 pt-[210px]">
+    
+    <section>
+      <div class="flex justify-between items-end mb-4">
+        <h2 class="font-bold text-secondary text-lg">Recommended</h2>
+        <a href="#" class="text-primary text-sm font-bold hover:underline">See All</a>
+      </div>
+      <div class="flex gap-4 overflow-x-auto hide-scroll pb-6 -mx-5 px-5">
+        
+        <div class="min-w-[280px] h-[220px] bg-gradient-to-br from-secondary to-[#1e4b8a] rounded-2xl p-5 text-white shadow-card relative overflow-hidden group cursor-pointer active:scale-95 transition-transform">
+           <div class="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+           <div class="flex justify-between items-start relative z-10">
+             <div class="bg-white/20 backdrop-blur-md p-2 rounded-lg"><i class="fas fa-hard-hat text-lg"></i></div>
+             <span class="px-2 py-1 bg-primary text-white text-xs font-bold rounded uppercase tracking-wider shadow-sm">Urgent</span>
+           </div>
+           
+           <div class="absolute bottom-16 left-5">
+             <p class="text-gray-300 text-sm mb-1 font-medium">Shell • Sarawak</p>
+             <h3 class="font-bold text-lg leading-tight mb-1">Safety Supervisor</h3>
+             <p class="font-bold text-lg">RM 650 <span class="text-xs opacity-70 font-normal">/day</span></p>
+           </div>
+           <div class="absolute bottom-0 left-0 right-0 p-3 bg-white/10 backdrop-blur-sm border-t border-white/20">
+               <button onclick="openProjectDetails('Safety Supervisor', 'RM 650 / Day', 'Shell')" class="w-full py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-opacity-90 active:scale-95 transition-transform">APPLY NOW</button>
+           </div>
+        </div>
+
+        <div class="min-w-[280px] h-[220px] bg-gradient-to-br from-secondary to-[#1e4b8a] rounded-2xl p-5 text-white shadow-card relative overflow-hidden cursor-pointer active:scale-95 transition-transform">
+           <div class="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+           <div class="flex justify-between items-start">
+             <div class="bg-white/20 backdrop-blur-md p-2 rounded-lg"><i class="fas fa-wrench text-lg"></i></div>
+             <span class="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded uppercase tracking-wider shadow-sm">High Pay</span>
+           </div>
+           
+           <div class="absolute bottom-16 left-5">
+             <p class="text-gray-300 text-sm mb-1 font-medium">Sapura • Sabah</p>
+             <h3 class="font-bold text-lg leading-tight mb-1">Lead Rigger</h3>
+             <p class="font-bold text-lg text-primary">RM 500 <span class="text-xs text-gray-300 font-normal">/day</span></p>
+           </div>
+           <div class="absolute bottom-0 left-0 right-0 p-3 bg-white/10 backdrop-blur-sm border-t border-white/20">
+               <button onclick="openProjectDetails('Lead Rigger', 'RM 500 / Day', 'Sapura')" class="w-full py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-opacity-90 active:scale-95 transition-transform">APPLY NOW</button>
+           </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <h2 class="font-bold text-secondary text-lg mb-4">Recent Opportunities</h2>
+      <div id="jobContainer" class="space-y-4">
+      </div>
+    </section>
+
+  </main>
+
+  <div id="calendarModal" class="modal-backdrop-sheet">
+    <div class="absolute inset-0" onclick="toggleCalendar()"></div>
+    <div class="modal-content-sheet h-[85vh] overflow-hidden">
+      <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-20">
+        <div><h2 class="text-xl font-bold text-secondary">My Roster</h2><p class="text-xs text-gray-500">2025 Rotation Schedule</p></div>
+        <button onclick="toggleCalendar()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 relative">
+        <div class="timeline-line"></div>
+        <div class="schedule-card flex gap-4 mb-8 opacity-60 grayscale">
+          <div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full bg-gray-400 ring-4 ring-white"></div></div>
+          <div class="flex-1 bg-gray-50 border border-gray-200 p-4 rounded-xl">
+            <div class="flex justify-between mb-2"><span class="text-xs font-bold bg-gray-200 text-gray-600 px-2 py-0.5 rounded">COMPLETED</span><span class="text-sm font-bold text-gray-400">Oct 1 - Oct 15</span></div>
+            <h4 class="font-bold text-gray-700">FPSO East Maintenance</h4><p class="text-sm text-gray-500 mt-1">Scaffolder • 14 Days</p>
+          </div>
+        </div>
+        <div class="schedule-card flex gap-4 mb-8">
+          <div class="flex flex-col items-center pt-1"><div class="w-3 h-3 rounded-full bg-primary ring-4 ring-white shadow-[0_0_0_4px_rgba(0,194,203,0.3)]"></div></div>
+          <div class="flex-1 bg-white border border-primary/30 shadow-lg shadow-primary/10 p-4 rounded-xl relative overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+            <div class="flex justify-between mb-2"><span class="text-xs font-bold bg-primary/10 text-primary px-2 py-0.5 rounded animate-pulse">ACTIVE MISSION</span><span class="text-sm font-bold text-secondary">Nov 18 - Nov 25</span></div>
+            <h4 class="font-bold text-secondary text-lg">FPSO West Mobilization</h4>
+            <p class="text-sm text-gray-500 mt-1">Lead Rigger • 7 Days</p>
+            <div class="mt-3 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-primary w-[45%]"></div></div>
+            <p class="text-xs text-right text-gray-400 mt-1">Day 3 of 7</p>
+          </div>
+        </div>
+        <div class="schedule-card flex gap-4 mb-8">
+          <div class="flex flex-col items-center pt-1"><div class="w-3 h-3 rounded-full bg-secondary ring-4 ring-white"></div></div>
+          <div class="flex-1 bg-white border border-gray-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+            <div class="flex justify-between mb-2"><span class="text-xs font-bold bg-secondary/10 text-secondary px-2 py-0.5 rounded">UPCOMING</span><span class="text-sm font-bold text-secondary">Dec 10 - Dec 24</span></div>
+            <h4 class="font-bold text-gray-800">Dry Dock Inspection</h4>
+            <p class="text-sm text-gray-500 mt-1">Safety Supervisor • 14 Days</p>
+            <div class="mt-2 border-t border-dashed border-gray-200 pt-2 flex items-center text-sm text-gray-400"><i class="fas fa-plane mr-2"></i> Flight Pending</div>
+          </div>
+        </div>
+        <div class="schedule-card flex gap-4 mb-8">
+          <div class="flex flex-col items-center pt-1"><div class="w-3 h-3 rounded-full bg-gray-200 ring-4 ring-white"></div></div>
+          <div class="flex-1 py-2"><p class="text-sm text-gray-400 italic">No gigs scheduled for January 2026</p></div>
+        </div>
+      </div>
+      <div class="p-5 border-t border-gray-100"><button class="w-full py-3 bg-secondary text-white font-bold rounded-xl shadow-lg">Sync to Phone Calendar</button></div>
+    </div>
+  </div>
+
+  <div id="projectModal" class="modal-backdrop-center">
+      <div class="absolute inset-0" onclick="closeProjectDetails()"></div>
+      <div class="modal-content-center h-auto">
+          <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-20">
+              <h2 class="text-xl font-bold text-secondary">Project Details</h2>
+              <button onclick="closeProjectDetails()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-6 space-y-5">
+              <div class="bg-primary/5 p-4 rounded-xl border border-primary/20">
+                  <p class="text-xs text-primary font-bold uppercase tracking-widest">Role</p>
+                  <h3 id="modalJobTitle" class="text-2xl font-extrabold text-secondary mt-1"></h3>
+                  <p id="modalJobRate" class="text-lg font-semibold text-gray-600 mt-1"></p>
+              </div>
+              <div class="space-y-3">
+                  <div class="flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+                      <i class="fas fa-map-pin text-xl text-primary"></i>
+                      <div><p class="text-xs text-gray-400">Location</p><p class="font-bold text-sm text-secondary">Sarawak Offshore Block</p></div>
+                  </div>
+                   <div class="flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+                      <i class="fas fa-clock text-xl text-primary"></i>
+                      <div><p class="text-xs text-gray-400">Duration</p><p class="font-bold text-sm text-secondary">21 Day Rotation</p></div>
+                  </div>
+                   <div class="flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+                      <i class="fas fa-ship text-xl text-primary"></i>
+                      <div><p class="text-xs text-gray-400">Vessel</p><p id="modalVessel" class="font-bold text-sm text-secondary">FPSO East - Shell</p></div>
+                  </div>
+              </div>
+              <h4 class="font-bold text-secondary text-base pt-2 border-t border-gray-100">Job Description</h4>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Seeking a highly motivated Safety Supervisor for immediate mobilization. Must hold valid BOSIET, OGUK Medical, and relevant leadership certificates. 24-hour stand-by rotation.
+              </p>
+          </div>
+          <div class="p-5 border-t border-gray-100">
+              <button class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20">Proceed to Application</button>
+          </div>
+      </div>
+  </div>
+
+  <div id="missingCertModal" class="modal-backdrop-center">
+      <div class="absolute inset-0" onclick="closeMissingCertModal()"></div>
+      <div class="modal-content-center h-auto overflow-hidden"> 
+        <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-20">
+            <h2 class="text-xl font-bold text-red-600">⚠ Requirements Missing</h2>
+            <button onclick="closeMissingCertModal()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+            <p class="text-sm text-gray-700">You do not meet all requirements for this job. To apply, you need to update or acquire the following documents:</p>
+            
+            <ul id="modalMissingList" class="space-y-3 p-4 bg-red-50 rounded-xl border border-red-200">
+            </ul>
+
+            <p class="text-sm text-gray-500 pt-2 border-t border-gray-100">
+                You can upload renewed documents or find training courses under your Profile section.
+            </p>
+        </div>
+        <div class="p-5 border-t border-gray-100">
+          <div class="flex gap-3">
+            <button id="findTrainingBtn" class="flex-1 py-3 bg-gray-100 border border-gray-200 text-gray-700 font-bold rounded-xl active:scale-95 transition-transform">
+              Register for Training
+            </button>
+            <button id="uploadCertBtn" class="flex-1 py-3 bg-secondary text-white font-bold rounded-xl shadow-lg shadow-secondary/20 active:scale-95 transition-transform">
+              Upload Certificate
+            </button>
+          </div>
+        </div>
+        </div>
+  </div>
+
+  <nav class="bottom-nav fixed bottom-0 w-full bg-white border-t border-gray-100 z-50 grid grid-cols-5">
+    <a href="home.html" class="nav-item active"><i class="fas fa-briefcase"></i><span>Jobs</span></a>
+    <a href="messages.html" class="nav-item"><i class="fas fa-comments"></i><span>Messages</span></a>
+    <a href="mobilize.html" class="nav-item relative">
+      <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center -mt-10 shadow-lg border border-gray-10">
+        <img src="https://ik.imagekit.io/f4l5qeepf/Picture1.png?updatedAt=1763021734931" alt="Offshore Rig" class="w-16 h-16 object-contain mx-auto rig-icon"/>
+      </div>
+      <span class="mt-1 text-xs font-medium text-gray-400">Mission</span>
+    </a>
+    <a href="orders.html" class="nav-item"><i class="fas fa-file-invoice-dollar"></i><span>Orders</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+  </nav>
+
+  <script>
+    // --- MODAL FUNCTIONS ---
+    function toggleCalendar() {
+      document.getElementById('calendarModal').classList.toggle('open');
+      document.body.style.overflow = document.getElementById('calendarModal').classList.contains('open') ? 'hidden' : '';
+    }
+
+    function openProjectDetails(title, rate, company) {
+        document.getElementById('modalJobTitle').textContent = title;
+        document.getElementById('modalJobRate').textContent = rate;
+        document.getElementById('modalVessel').textContent = `FPSO - ${company}`;
+        document.getElementById('projectModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeProjectDetails() {
+        document.getElementById('projectModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function openMissingCertModal(certs) {
+        const listContainer = document.getElementById('modalMissingList');
+        listContainer.innerHTML = '';
+        const certArray = certs.split(', ');
+        
+        certArray.forEach(cert => {
+            const listItem = document.createElement('li');
+            listItem.className = 'flex items-center gap-2 text-sm font-semibold text-red-700';
+            listItem.innerHTML = `<i class="fas fa-times-circle text-red-500"></i> ${cert}`;
+            listContainer.appendChild(listItem);
+        });
+        
+        document.getElementById('missingCertModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMissingCertModal() {
+        document.getElementById('missingCertModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // --- JOB DATA AND RENDERING ---
+    const jobs = [
+      {id:1, title:"Offshore Scaffolder", company:"PETRONAS Carigali", location:"Labuan", date:"Starts 18 Nov", tags:["BOSIET", "WAH"], rate:"420", qualified: true},
+      {id:4, title:"Insulation Technician", company:"MMHE Engineering", location:"Bintulu", date:"Starts 22 Nov", tags:["Level 3", "BOSIET"], rate:"460", qualified: false, missingCert: "Trade Cert Level 3, H2S Awareness"},
+      {id:5, title:"Blaster Painter", company:"Dayang Enterprise", location:"Miri", date:"Starts 30 Nov", tags:["Blasting Cert", "OGSP"], rate:"400", qualified: true},
+      {id:3, title:"Structural Welder 6G", company:"Petronas", location:"Bintulu", date:"Starts 5 Dec", tags:["6G Cert", "BOSIET"], rate:"550", qualified: false, missingCert: "OGUK Medical, 6G Renewal"},
+    ];
+
+    const container = document.getElementById('jobContainer');
+
+    function renderSkeletons() {
+      container.innerHTML = ''; 
+      for (let i = 0; i < 3; i++) {
+        const skeletonCard = document.createElement('div');
+        skeletonCard.className = 'bg-white rounded-2xl p-5 border border-gray-100 shadow-card animate-pulse';
+        skeletonCard.innerHTML = `
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex gap-3 w-full">
+              <div class="w-10 h-10 rounded-lg bg-gray-200"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+            <div class="h-5 bg-gray-200 rounded-full w-20"></div>
+          </div>
+          <div class="flex gap-2 mb-4">
+            <div class="h-5 bg-gray-200 rounded w-16"></div>
+            <div class="h-5 bg-gray-200 rounded w-16"></div>
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-gray-50">
+            <div class="space-y-1">
+              <div class="h-5 bg-gray-200 rounded w-24"></div>
+              <div class="h-3 bg-gray-200 rounded w-20"></div>
+            </div>
+            <div class="h-9 bg-gray-200 rounded-lg w-28"></div>
+          </div>
+        `;
+        container.appendChild(skeletonCard);
+      }
+    }
+
+    function renderJobs() {
+      container.innerHTML = '';
+      jobs.forEach((job, index) => {
+        const card = document.createElement('div');
+        
+        /*
+        =================================
+        IMPROVED: Added whitespace-nowrap
+        =================================
+        */
+        let statusBadge = job.qualified 
+          ? `<span class="bg-green-50 text-green-700 border border-green-100 text-xs font-bold px-2 py-1 rounded-full flex items-center whitespace-nowrap"><i class="fas fa-check-circle mr-1"></i> Qualified</span>`
+          : `<span class="bg-red-50 text-red-600 border border-red-100 text-xs font-bold px-2 py-1 rounded-full flex items-center whitespace-nowrap"><i class="fas fa-exclamation-triangle mr-1"></i> Not Qualified</span>`;
+        /* =============================== */
+
+        let cardBorder = job.qualified ? 'border-gray-100' : 'border-red-100';
+        
+        let actionButton = job.qualified
+          ? `<button onclick="openProjectDetails('${job.title}', 'RM ${job.rate} / Day', '${job.company}')" class="px-4 py-2 bg-secondary text-white text-sm font-bold rounded-lg shadow-lg shadow-secondary/20 active:scale-95 transition-transform">Apply Now</button>`
+          : `<button onclick="openMissingCertModal('${job.missingCert}')" class="px-4 py-2 bg-white border border-red-200 text-red-500 text-sm font-bold rounded-lg hover:bg-red-50 transition-colors">View Missing Cert</button>`;
+
+        card.className = `bg-white rounded-2xl p-5 border ${cardBorder} shadow-card relative overflow-hidden hover:shadow-lg transition-all duration-300 active:scale-[0.98]`;
+
+        card.innerHTML = `
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-lg">
+                  ${getIcon(job.title)}
+              </div>
+              <div>
+                <h3 class="font-bold text-secondary text-base leading-tight">${job.title}</h3>
+                <p class="text-sm text-gray-500 mt-0.5">${job.company} • ${job.location}</p>
+              </div>
+            </div>
+            ${statusBadge}
+          </div>
+
+          <div class="flex gap-2 mb-4">
+            ${job.tags.map(tag => `<span class="px-2 py-1 bg-gray-50 border border-gray-100 text-xs font-medium text-gray-500 rounded-md">${tag}</span>`).join('')}
+          </div>
+
+          <div class="flex justify-between items-center pt-3 border-t border-gray-50">
+             <div class="font-bold text-secondary">
+               <span class="text-sm">RM</span> ${job.rate}<span class="text-xs text-gray-400 font-normal">/day</span>
+               <div class="text-xs text-gray-400 font-normal mt-0.5">${job.date}</div>
+             </div>
+             ${actionButton}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function getIcon(title) {
+      if(title.includes('Scaffolder')) return '<i class="fas fa-th text-orange-500"></i>';
+      if(title.includes('Welder')) return '<i class="fas fa-fire text-red-500"></i>';
+      if(title.includes('Painter')) return '<i class="fas fa-paint-roller text-blue-500"></i>';
+      return '<i class="fas fa-hard-hat text-primary"></i>';
+    }
+
+    function handleFilterClick(event) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-secondary', 'text-white', 'font-bold', 'shadow-md');
+        btn.classList.add('bg-white', 'border-gray-200', 'text-gray-600', 'font-semibold');
+      });
+      
+      const clickedBtn = event.currentTarget;
+      clickedBtn.classList.add('bg-secondary', 'text-white', 'font-bold', 'shadow-md');
+      clickedBtn.classList.remove('bg-white', 'border-gray-200', 'text-gray-600', 'font-semibold');
+      
+      alert('Filtering by ' + clickedBtn.id.split('-')[1]);
+    }
+
+    // --- SCRIPT EXECUTION ---
+    
+    // 1. Render skeletons immediately
+    renderSkeletons();
+    
+    // 2. Wait 1.5s, then render real jobs
+    setTimeout(renderJobs, 1500);
+
+    // 3. Add listeners for modals and filters
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('calendarBtn').addEventListener('click', toggleCalendar);
+      document.getElementById('notificationsBtn').addEventListener('click', () => alert('Notifications not available in this demo.'));
+      
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', handleFilterClick);
+      });
+
+      document.getElementById('uploadCertBtn').addEventListener('click', () => {
+        window.location.href = 'profile.html';
+      });
+
+      document.getElementById('findTrainingBtn').addEventListener('click', () => {
+        alert('This would take you to the Training Portal to find a course.');
+      });
+    });
+  </script>
+</body>
+</html>

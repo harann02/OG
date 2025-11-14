@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OffshoreGigs — Earnings</title>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00C2CB',
+            secondary: '#0A2E5C',
+            turquoise: {
+              50: '#e6f9f7',
+              100: '#ccf3ef',
+              200: '#99e6de',
+              300: '#66d9cd',
+              400: '#33ccb9',
+              500: '#00bfa5',
+              600: '#009a85',
+              700: '#007565',
+              800: '#005045',
+              900: '#002b25',
+            },
+            status: {
+              open: '#0b3248',
+              offered: '#F59E0B',
+              closed: '#EF4444',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+      color: #0f172a;
+    }
+
+    .main-content {
+      padding-bottom: 80px; /* space for bottom nav */
+    }
+
+    /* --- BOTTOM NAV STYLES (Restored) --- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      z-index: 50;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #64748b;
+      text-decoration: none;
+    }
+
+    .nav-item i {
+      font-size: 1.2rem;
+      margin-bottom: 3px;
+    }
+
+    .nav-item.active {
+      color: #00C2CB;
+    }
+    /* --- END BOTTOM NAV STYLES --- */
+
+
+    /* --- TAB STYLES (Restored) --- */
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 1rem;
+      background: #ffffff;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 0.75rem 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-align: center;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      color: #0f172a;
+    }
+
+    .tab-button.active {
+      border-color: #00bfa5; /* Using original color */
+      color: #0A2E5C;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+    /* --- END TAB STYLES --- */
+
+
+    /* --- CONTRACT CARD (Restored) --- */
+    .contract-card {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+    }
+    /* --- END CONTRACT CARD --- */
+
+    /* --- STATUS PILLS (Restored) --- */
+    .status-pill {
+      border-radius: 9999px;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .status-pill-active {
+      background: rgba(11, 50, 72, 0.08);
+      color: #0b3248;
+      border-color: rgba(11, 50, 72, 0.25);
+    }
+
+    .status-pill-confirmed {
+      background: rgba(245, 158, 11, 0.08);
+      color: #b45309;
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .status-pill-completed {
+      background: rgba(239, 68, 68, 0.08);
+      color: #b91c1c;
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+    /* --- END STATUS PILLS --- */
+
+  </style>
+</head>
+<body class="text-gray-800">
+  <div class="bg-white shadow-sm sticky top-0 z-40">
+    <div class="px-4 py-4 flex items-center justify-between">
+      <h1 class="text-lg font-bold text-secondary">Earnings</h1>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-button active" data-tab="active">Active Orders</button>
+      <button class="tab-button" data-tab="upcoming">Upcoming Orders</button>
+      <button class="tab-button" data-tab="completed">Completed Orders</button>
+    </div>
+  </div>
+
+  <div class="main-content px-4 py-4 space-y-8">
+    
+    <div id="active" class="tab-content active space-y-4"> 
+      <h3 class="font-bold text-gray-900 text-lg mb-4">Active Orders</h3>
+
+      <div class="contract-card">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Offshore Scaffolder – FPSO West</h4>
+            <p class="text-gray-600 text-sm mt-1">PETRONAS Carigali • Labuan</p>
+            <div class="flex items-center mt-2 space-x-4 text-sm">
+              <span class="status-pill status-pill-active">Active</span>
+              <span class="text-gray-600">28-Day Rotation</span>
+              <span class="text-gray-500">Starts 18 Nov 2025 </span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 15,360</div>
+            <div class="text-gray-500 text-sm">Gross Total</div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center space-x-4">
+          <div class="flex-1 h-1 bg-gray-200 rounded-full">
+            <div class="h-full bg-gradient-to-r from-green-400 to-green-600 rounded-full w-3/4"></div>
+          </div>
+         
+        </div>
+
+        <div class="mt-6 flex justify-end"> <button class="text-turquoise-600 text-sm font-medium hover:underline">View Earnings & Details</button>
+        </div>
+      </div>
+      </div>
+    <div id="upcoming" class="tab-content space-y-4">
+      <h3 class="font-bold text-gray-900 text-lg mb-4">Upcoming Orders</h3>
+
+      <div class="contract-card">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Welder – East Malaysia Platform</h4>
+            <p class="text-gray-600 text-sm mt-1">Shell Malaysia • Kuching</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-confirmed">Pending</span>
+              <span class="text-gray-500">21-Day Rotation</span>
+              <span class="text-gray-500">Starts 05 Dec 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 10,080</div>
+            <div class="text-gray-500 text-sm">Estimated Total</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Details</button>
+        </div>
+      </div>
+
+      <div class="contract-card">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Blaster – Central Sabah Rig</h4>
+            <p class="text-gray-600 text-sm mt-1">PETRONAS Carigali • Sandakan</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-confirmed">Pending</span>
+              <span class="text-gray-500">28-Day Rotation</span>
+              <span class="text-gray-500">Starts 12 Dec 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 12,040</div>
+            <div class="text-gray-500 text-sm">Estimated Total</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Details</button>
+        </div>
+      </div>
+
+      <div class="contract-card">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Rigger – Southern Platform</h4>
+            <p class="text-gray-600 text-sm mt-1">ExxonMobil • Johor</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-confirmed">Pending</span>
+              <span class="text-gray-500">35-Day Rotation</span>
+              <span class="text-gray-500">Starts 19 Dec 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 16,800</div>
+            <div class="text-gray-500 text-sm">Estimated Total</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Details</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="completed" class="tab-content space-y-4">
+      <h3 class="font-bold text-gray-900 text-lg mb-4">Completed Orders</h3>
+
+      <div class="contract-card opacity-80">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Rigger – Southern Platform</h4>
+            <p class="text-gray-600 text-sm mt-1">ExxonMobil • Johor</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-completed">Completed</span>
+              <span class="text-gray-500">35-Day Rotation</span>
+              <span class="text-gray-500">Ended 10 Oct 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 16,800</div>
+            <div class="text-gray-500 text-sm">Total Earned</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Statement</button>
+</div>
+      </div>
+
+      <div class="contract-card opacity-80">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Scaffolder – Northern Rig</h4>
+            <p class="text-gray-600 text-sm mt-1">TotalEnergies • Terengganu</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-completed">Completed</span>
+              <span class="text-gray-500">42-Day Rotation</span>
+              <span class="text-gray-500">Ended 25 Sep 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 18,480</div>
+            <div class="text-gray-500 text-sm">Total Earned</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Statement</button>
+        </div>
+      </div>
+
+      <div class="contract-card opacity-80">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Painter – Central Platform</h4>
+            <p class="text-gray-600 text-sm mt-1">PETRONAS • Miri</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-completed">Completed</span>
+              <span class="text-gray-500">30-Day Rotation</span>
+              <span class="text-gray-500">Ended 05 Aug 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 11,700</div>
+            <div class="text-gray-500 text-sm">Total Earned</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Statement</button>
+        </div>
+      </div>
+
+      <div class="contract-card opacity-80">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Welder – Western Drilling</h4>
+            <p class="text-gray-600 text-sm mt-1">Schlumberger • Bintulu</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-completed">Completed</span>
+              <span class="text-gray-500">28-Day Rotation</span>
+              <span class="text-gray-500">Ended 18 Jul 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 13,440</div>
+            <div class="text-gray-500 text-sm">Total Earned</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Statement</button>
+        </div>
+      </div>
+
+      <div class="contract-card opacity-80">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h4 class="font-bold text-gray-900">Rigger – Eastern Gas</h4>
+            <p class="text-gray-600 text-sm mt-1">Petronas Carigali • Kota Kinabalu</p>
+            <div class="flex items-center mt-2 space-x-4 text-xs">
+              <span class="status-pill status-pill-completed">Completed</span>
+              <span class="text-gray-500">56-Day Rotation</span>
+              <span class="text-gray-500">Ended 30 Jun 2025</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-2">
+            <div class="text-2xl font-bold text-secondary">RM 26,880</div>
+            <div class="text-gray-500 text-sm">Total Earned</div>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button class="text-turquoise-600 text-sm font-medium hover:underline">View Statement</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab Switching Logic (Slightly cleaner)
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabContainer = document.querySelector('.tab-bar');
+
+    tabContainer.addEventListener('click', (event) => {
+      const clickedButton = event.target.closest('.tab-button');
+      if (!clickedButton) return;
+
+      // reset buttons
+      tabButtons.forEach((btn) => btn.classList.remove('active'));
+      // reset contents
+      tabContents.forEach((content) => content.classList.remove('active'));
+
+      // activate current
+      clickedButton.classList.add('active');
+      const tabId = clickedButton.getAttribute('data-tab');
+      const tabContent = document.getElementById(tabId);
+      if (tabContent) tabContent.classList.add('active');
+    });
+
+  </script>
+  
+  <nav class="bottom-nav fixed bottom-0 w-full bg-white border-t border-gray-100 z-50 flex justify-around items-center">
+    <a href="home.html" class="nav-item"><i class="fas fa-briefcase" aria-hidden="true"></i><span>Jobs</span></a>
+    <a href="messages.html" class="nav-item"><i class="fas fa-comments" aria-hidden="true"></i><span>Messages</span></a>
+    <a href="mobilize.html" class="nav-item relative">
+      <div class="w-14 h-14 flex items-center justify-center -mt-6">
+        <img src="https://ik.imagekit.io/f4l5qeepf/Picture1.png?updatedAt=1763021734931"
+             alt="Offshore Rig" class="w-20 h-20 object-contain mx-auto rig-icon"/>
+      </div>
+      <span class="mt-1 text-[10px] font-medium text-gray-400">Mission</span>
+    </a>
+    <a href="orders.html" class="nav-item active"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i><span>Orders</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user" aria-hidden="true"></i><span>Profile</span></a>
+  </nav>
+
+</body>
+</html>

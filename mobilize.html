@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en" class="grey-50 dark:bg-gray-900">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission Control — Mobilize</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00C2CB',
+            'primary-dark': '#00989f',
+            secondary: '#0A2E5C',
+            background: '#f8fafc',
+            'background-dark': '#0f172a',
+            surface: '#ffffff',
+            'surface-dark': '#1e293b',
+          },
+          boxShadow: {
+            'glow': '0 0 15px rgba(0, 194, 203, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    /* =================================
+    IMPROVED: Matched profile.html
+    =================================
+    */
+    .bottom-nav {
+      /* Removed redundant properties handled by Tailwind */
+      height: 80px;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    html.dark .bottom-nav { background: #1e293b; border-top-color: #334155; }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; /* Added to vertically center content */
+      height: 100%; /* Added to fill the 80px bar */
+      font-size: 10px; /* Matched profile.html */
+      font-weight: 500; /* Matched profile.html */
+      color: #64748b;
+      transition: color 0.2s ease;
+    }
+    /* =============================== */
+    
+    html.dark .nav-item { color: #94a8bb; }
+    .nav-item.active { color: #00C2CB; font-weight: 600; }
+    .nav-item i { font-size: 20px; margin-bottom: 4px; } /* Matched profile.html */
+
+    .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .tab-content.active-view { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .tab-btn.active { color: #00C2CB; border-bottom: 2px solid #00C2CB; }
+    .tab-btn { color: #94a3b8; border-bottom: 2px solid transparent; }
+    
+    .upload-zone {
+      background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23CBD5E1FF' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    }
+    html.dark .upload-zone {
+      background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23475569FF' stroke-width='2' stroke-dasharray='12%2c 12' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+    }
+  </style>
+</head>
+<body class="bg-background dark:bg-background-dark text-gray-800 dark:text-gray-200 pb-28 transition-colors duration-300">
+
+  <div class="bg-surface dark:bg-surface-dark pt-4 pb-0 sticky top-0 z-40 shadow-sm">
+    <div class="px-5 mb-2 flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-secondary dark:text-white tracking-tight">Mission Control</h1>
+        <p class="text-xs text-gray-500 dark:text-gray-400">FPSO West Rig #OG-8829</p>
+      </div>
+      <div class="flex items-center">
+         <span class="text-[10px] font-bold bg-orange-100 text-orange-600 px-2 py-1 rounded-full mr-2">PRE-MOB</span>
+         <img src="https://ik.imagekit.io/f4l5qeepf/Oil%20rig_b0T9-MU0F?updatedAt=1756800573934" class="w-8 h-8 object-contain opacity-80">
+      </div>
+    </div>
+
+    <div class="flex justify-between px-4 mt-2">
+      <button onclick="switchTab('premob')" id="btn-premob" class="tab-btn active flex-1 pb-3 text-sm font-semibold text-center transition-all">Pre-Mob</button>
+      <button onclick="switchTab('active')" id="btn-active" class="tab-btn flex-1 pb-3 text-sm font-semibold text-center transition-all">Active</button>
+      <button onclick="switchTab('closeout')" id="btn-closeout" class="tab-btn flex-1 pb-3 text-sm font-semibold text-center transition-all">Close-out</button>
+    </div>
+  </div>
+
+  <div class="main-content px-4 pt-6 max-w-md mx-auto">
+
+    <div id="tab-premob" class="tab-content active-view">
+      
+      <div class="bg-white dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-4">
+        <h3 class="font-bold text-secondary dark:text-white mb-3 flex items-center">
+            <i class="fas fa-clipboard-list text-primary mr-2"></i> Mission Brief
+        </h3>
+        <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 pl-1">
+            <div class="flex items-start">
+                <div class="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 mr-2 flex-shrink-0"></div>
+                <p>Conduct NDT inspection on flare stack piping (Loop A & B).</p>
+            </div>
+            <div class="flex items-start">
+                <div class="w-1.5 h-1.5 rounded-full bg-gray-400 mt-1.5 mr-2 flex-shrink-0"></div>
+                <p>Report directly to OIM regarding corrosion levels.</p>
+            </div>
+        </div>
+      </div>
+
+      <h3 class="font-bold text-gray-900 dark:text-white mb-2 text-sm uppercase tracking-wide text-opacity-70">Command Chain</h3>
+      <div class="grid grid-cols-2 gap-3 mb-6">
+          <div class="bg-white dark:bg-surface-dark p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center relative overflow-hidden group">
+              <div class="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
+              <div class="w-12 h-12 rounded-full bg-gray-200 mb-2 overflow-hidden">
+                  <img src="https://ui-avatars.com/api/?name=Rahim+Ali&background=0A2E5C&color=fff" alt="Manager">
+              </div>
+              <p class="font-bold text-sm">Rahim Ali</p>
+              <p class="text-[10px] text-gray-500 mb-3">Rig Superintendent</p>
+              <div class="flex space-x-2 w-full justify-center">
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fas fa-phone"></i></a>
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fab fa-whatsapp"></i></a>
+              </div>
+          </div>
+
+          <div class="bg-white dark:bg-surface-dark p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+              <div class="w-12 h-12 rounded-full bg-gray-200 mb-2 overflow-hidden">
+                  <img src="https://ui-avatars.com/api/?name=Sarah+Tan&background=00C2CB&color=fff" alt="HR">
+              </div>
+              <p class="font-bold text-sm">Sarah Tan</p>
+              <p class="text-[10px] text-gray-500 mb-3">Agency HR</p>
+              <div class="flex space-x-2 w-full justify-center">
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 flex items-center justify-center hover:bg-green-100 hover:text-green-600 transition"><i class="fas fa-phone"></i></a>
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 flex items-center justify-center hover:bg-blue-100 hover:text-blue-600 transition"><i class="fas fa-envelope"></i></a>
+              </div>
+          </div>
+      </div>
+
+      <div class="flex justify-between items-end mb-2">
+        <h3 class="font-bold text-gray-900 dark:text-white">Checklist</h3>
+        <span class="text-xs font-bold text-orange-500">50% Ready</span>
+      </div>
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
+        <div class="bg-orange-500 h-2 rounded-full shadow-glow" style="width: 50%"></div>
+      </div>
+
+      <div class="space-y-3 mb-6">
+        
+        <div class="checklist-item flex items-center p-3 bg-white dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm opacity-70">
+          <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-sm"><i class="fas fa-check"></i></div>
+          <div class="flex-1"><p class="font-medium text-sm">Medical Certificate</p><p class="text-[10px] text-gray-400">Valid until 2026</p></div>
+        </div>
+
+        <div class="checklist-item flex items-center p-3 bg-white dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm opacity-70">
+          <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-sm"><i class="fas fa-check"></i></div>
+          <div class="flex-1"><p class="font-medium text-sm ">BOSIET/HUET</p><p class="text-[10px] text-gray-400">Verified</p></div>
+        </div>
+
+        <div class="checklist-item flex items-center p-3 bg-white dark:bg-surface-dark rounded-xl border border-orange-200 dark:border-orange-900/50 shadow-md ring-1 ring-orange-100 dark:ring-orange-900/30">
+          <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center mr-3 flex-shrink-0 text-sm animate-pulse">
+            <i class="fas fa-camera"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-bold text-sm text-gray-800 dark:text-gray-100">Verify PPE Gear</p>
+            <p class="text-[10px] text-orange-600 dark:text-orange-400 font-medium">Photo Required (Boots, Helmet)</p>
+          </div>
+          <button class="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow hover:bg-primary-dark transition">
+            Upload
+          </button>
+        </div>
+
+        <div class="checklist-item flex items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+            <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center mr-3 flex-shrink-0 text-sm">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div class="flex-1">
+                <p class="font-medium text-sm text-gray-600 dark:text-gray-300">Offshore Passport</p>
+                <p class="text-[10px] text-gray-400">Pending Admin Verification...</p>
+            </div>
+            <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+        </div>
+
+      </div>
+
+      <button disabled class="w-full py-4 bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 font-bold rounded-xl cursor-not-allowed border border-gray-300 dark:border-gray-600">
+         Complete Checklist to Mobilize
+      </button>
+    </div>
+
+
+    <div id="tab-active" class="tab-content">
+      
+      <div class="bg-secondary dark:bg-surface-dark rounded-2xl p-5 mb-6 text-white shadow-lg relative overflow-hidden border dark:border-gray-700">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10"></div>
+        <div class="flex justify-between items-start relative z-10">
+            <div><p class="text-gray-300 text-xs mb-1">Current Rotation</p><h2 class="text-3xl font-bold">Day 3 <span class="text-lg font-normal text-gray-400">/ 7</span></h2></div>
+            <div class="text-right"><p class="text-gray-300 text-xs mb-1">Est. Earnings</p><h2 class="text-2xl font-bold text-primary">RM 1,680</h2></div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-gray-900 dark:text-white">Daily Logs</h3>
+        <button class="text-xs bg-primary text-white px-3 py-1.5 rounded-lg shadow-md hover:bg-primary-dark"><i class="fas fa-plus mr-1"></i> Add Claim</button>
+      </div>
+
+      <div class="relative border-l-2 border-gray-200 dark:border-gray-700 ml-3 space-y-6 pb-4">
+        
+        <div class="mb-2 ml-6 relative">
+            <span class="absolute -left-[31px] top-1 w-4 h-4 bg-primary rounded-full border-4 border-white dark:border-gray-900"></span>
+            <p class="text-xs font-bold text-primary mb-1">Today, 20 Nov</p>
+            <div class="bg-white dark:bg-surface-dark p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <div><p class="font-bold text-sm">Regular Shift</p><p class="text-xs text-gray-500">08:00 - 20:00</p></div>
+                    <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-500">In Progress</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-2 ml-6 relative">
+            <span class="absolute -left-[31px] top-1 w-4 h-4 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></span>
+            <p class="text-xs font-bold text-gray-500 mb-1">Yesterday, 19 Nov</p>
+            <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                
+                <div class="p-3 flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-sm">Regular Shift</p>
+                        <p class="text-xs text-gray-500">12 Hours</p>
+                    </div>
+                    <div class="flex items-center text-green-600 text-xs font-bold">
+                        <i class="fas fa-check-circle mr-1"></i> Verified
+                    </div>
+                </div>
+
+                <div class="bg-primary/5 p-3 border-t border-dashed border-primary/30">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start">
+                            <div class="bg-white dark:bg-surface-dark p-1.5 rounded-lg text-primary border border-primary/20 mr-3">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm text-gray-800 dark:text-gray-100">Overtime Claim</p>
+                                <p class="text-[10px] text-gray-500">Flare Tip Inspection Assist</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold text-sm text-secondary dark:text-primary">+ RM 225</p>
+                            <p class="text-[10px] text-gray-400">3 Hrs @ RM 75</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div id="tab-closeout" class="tab-content">
+      <div class="bg-surface dark:bg-surface-dark rounded-2xl p-5 mb-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+           <div class="flex items-center">
+             <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 mr-3"><i class="fas fa-file-signature"></i></div>
+             <div><h2 class="font-bold text-gray-900 dark:text-white">Job Completion</h2><p class="text-xs text-gray-500">Pending Timesheet</p></div>
+           </div>
+        </div>
+        <div class="flex items-center justify-between text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-2">
+          <span class="text-primary">Upload</span><span>Verify</span><span>Pay</span>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+          <div class="bg-primary h-1.5 rounded-full w-1/4 shadow-glow"></div>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <h3 class="font-bold text-gray-900 dark:text-white mb-2 flex items-center">Upload Verified Timesheet</h3>
+        <div class="upload-zone bg-gray-50 dark:bg-gray-800/30 rounded-2xl h-48 flex flex-col items-center justify-center cursor-pointer relative group hover:bg-primary/5 transition-colors">
+            <input type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="handleFileUpload(this)">
+            <div class="text-center p-6" id="upload-placeholder">
+                <div class="w-14 h-14 bg-white dark:bg-gray-700 rounded-full shadow-sm flex items-center justify-center mx-auto mb-3 text-primary text-2xl"><i class="fas fa-cloud-arrow-up"></i></div>
+                <p class="font-semibold text-secondary dark:text-gray-200">Tap to Upload</p>
+                <p class="text-xs text-gray-400 mt-1">PDF signed by OIM</p>
+            </div>
+            <div class="hidden text-center" id="upload-success">
+                <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3 text-green-600 text-2xl"><i class="fas fa-check"></i></div>
+                <p class="font-semibold text-gray-900 dark:text-white">Timesheet.pdf</p>
+            </div>
+        </div>
+      </div>
+      <button id="submit-btn" disabled class="w-full py-4 bg-gray-300 dark:bg-gray-700 text-gray-500 font-bold rounded-xl shadow-sm transition-all">Submit for Payment</button>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav fixed bottom-0 w-full bg-white dark:bg-surface-dark border-t border-gray-100 dark:border-gray-700 z-50 flex justify-around items-center">
+    <a href="home.html" class="nav-item"><i class="fas fa-briefcase" aria-hidden="true"></i><span>Jobs</span></a>
+    <a href="messages.html" class="nav-item"><i class="fas fa-comments" aria-hidden="true"></i><span>Messages</span></a>
+    <a href="mobilize.html" class="nav-item active relative"> <div class="w-14 h-14 flex items-center justify-center -mt-6">
+        <img src="https://ik.imagekit.io/f4l5qeepf/Picture1.png?updatedAt=1763021734931"
+             alt="Offshore Rig" class="w-20 h-20 object-contain mx-auto rig-icon"/>
+      </div>
+      <span class="mt-1 text-[10px] font-medium">Mission</span> </a>
+    <a href="orders.html" class="nav-item"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i><span>Orders</span></a>
+    <a href="profile.html" class="nav-item"><i class="fas fa-user" aria-hidden="true"></i><span>Profile</span></a>
+  </nav>
+  <script>
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active-view'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabName).classList.add('active-view');
+      document.getElementById('btn-' + tabName).classList.add('active');
+    }
+
+    function handleFileUpload(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('upload-placeholder').classList.add('hidden');
+            document.getElementById('upload-success').classList.remove('hidden');
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = false;
+            btn.classList.remove('bg-gray-300', 'text-gray-500', 'dark:bg-gray-700');
+            btn.classList.add('bg-secondary', 'text-white', 'shadow-lg');
+            btn.innerHTML = 'Submit Claim <i class="fas fa-check ml-2"></i>';
+        }
+    }
+  </script>
+</body>
+</html>

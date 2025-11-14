@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OffshoreGigs — Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00C2CB', // Teal
+            secondary: '#0A2E5C', // Navy
+            surface: '#ffffff',
+            background: '#F8FAFC',
+            accentRed: '#EF4444',
+            accentOrange: '#F59E0B',
+            whatsapp: '#25D366',
+          },
+          boxShadow: {
+            'card': '0 4px 20px -2px rgba(10, 46, 92, 0.08)',
+            'float': '0 10px 40px -10px rgba(0, 194, 203, 0.4)',
+            'modal': '0 -4px 20px rgba(0,0,0,0.1)',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { -webkit-tap-highlight-color: transparent; background-color: #F8FAFC; }
+    
+    .avatar-initials {
+      background: linear-gradient(135deg, #0A2E5C 0%, #1e4b8a 100%);
+      color: white;
+    }
+
+    .bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: 80px; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94A3B8; transition: color 0.2s; font-size: 10px; font-weight: 500; }
+    .nav-item i { font-size: 20px; margin-bottom: 4px; }
+    .nav-item.active { color: #00C2CB; }
+    
+    /* Animations */
+    .expandable-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    }
+    .expandable-content.open {
+      max-height: 150px;
+      opacity: 1;
+    }
+
+    /* Modal Animations */
+    #docModal, #bankingModal, #payslipModal { transition: opacity 0.3s ease; pointer-events: none; opacity: 0; }
+    #docModal.open, #bankingModal.open, #payslipModal.open { pointer-events: auto; opacity: 1; }
+    
+    #docModalContent, #bankingModalContent, #payslipModalContent { transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    #docModal.open #docModalContent, #bankingModal.open #bankingModalContent, #payslipModal.open #payslipModalContent { transform: translateY(0); }
+
+    /* Tab Active State */
+    .tab-btn.active {
+      color: #0A2E5C;
+      border-bottom: 2px solid #00C2CB;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body class="text-gray-800 min-h-screen pb-40">
+
+  <header class="fixed top-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100">
+    <div class="px-5 pt-5 pb-3 flex justify-between items-center">
+      <h1 class="text-xl font-bold text-secondary">My Profile</h1>
+      <button id="settingsBtn" class{="text-secondary hover:bg-gray-100 p-2 rounded-full transition"><i class="fas fa-cog text-lg" aria-hidden="true"></i></button>
+    </div>
+  </header>
+
+  <div class="h-[70px]"></div>
+
+  <main class="px-5 pt-6 space-y-5">
+
+    <div class="flex flex-col items-center text-center">
+      <div class="relative mb-3">
+        <div class="w-24 h-24 rounded-full avatar-initials p-1 shadow-card flex items-center justify-center border-4 border-white">
+          <span class="text-3xl font-bold tracking-wider">HH</span>
+        </div>
+        <div class="absolute bottom-0 right-0 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-full border-2 border-white shadow-sm">
+          LVL 3
+        </div>
+      </div>
+      
+      <h2 class="text-xl font-bold text-secondary flex items-center gap-2">
+        Hariharan
+        <span class="text-[10px] font-bold bg-green-50 text-green-600 border border-green-100 px-2 py-0.5 rounded-full uppercase tracking-wide">
+          Verified
+        </span>
+      </h2>
+      
+      <div class="flex gap-2 mt-2">
+        <div class="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1 rounded-full shadow-sm">
+          <i class="fas fa-wrench text-gray-400 text-xs" aria-hidden="true"></i>
+          <span class="text-xs font-semibold text-gray-500">Rigger / Roustabout</span>
+        </div>
+        <div class="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1 rounded-full shadow-sm">
+          <i class="fas fa-star text-orange-400 text-xs" aria-hidden="true"></i>
+          <span class="text-xs font-semibold text-gray-600">4.8 (12)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 shadow-card border border-gray-100">
+      <div class="flex justify-between items-start mb-1">
+        <div>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">ROTATION STATUS</p>
+          <h3 id="statusText" class="font-bold text-lg text-primary">Ready to Mobilize</h3>
+        </div>
+        <button id="toggleBtn" role="switch" aria-checked="true" class="w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none bg-primary relative shadow-inner cursor-pointer">
+            <div id="toggleKnob" class="w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 absolute top-1 left-1 translate-x-6"></div>
+        </button>
+      </div>
+      <p id="statusDesc" class="text-xs text-gray-500 leading-relaxed mt-2">
+        You are visible to Oil & Gas recruiters. Keep this active to receive new mission offers.
+      </p>
+      <div id="returnDateContainer" class="expandable-content">
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs font-bold text-secondary mb-2"><i class="fas fa-calendar-day mr-1" aria-hidden="true"></i> When are you back?</p>
+          <div class="flex gap-2">
+            <input type="date" value="2025-11-30" class="flex-1 bg-gray-50 border border-gray-200 text-xs font-medium rounded-lg px-3 py-2.5 outline-none focus:border-secondary">
+            <button id="setReturnDateBtn" class="bg-secondary text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-opacity-90">Set</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 shadow-card border border-gray-100 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-bl-full -mr-5 -mt-5"></div>
+      <h3 class="font-bold text-secondary text-base mb-4 flex items-center">
+        <i class="fas fa-wallet text-gray-300 mr-2" aria-hidden="true"></i> Wallet
+      </h3>
+      <div class="flex justify-between items-end mb-6">
+        <div class="text-left">
+          <p class="text-xs text-gray-400 mb-1">Total Earned</p>
+          <p class="text-xl font-extrabold text-secondary tracking-tight">RM 4,250.00</p>
+        </div>
+        <div class="h-8 w-px bg-gray-200 mx-2"></div>
+        <div class="text-right">
+          <p class="text-xs text-gray-400 mb-1">Available</p>
+          <p class="text-xl font-extrabold text-primary tracking-tight">RM 850.00</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button id="viewPayslipsBtn" class="flex-1 py-2.5 bg-gray-50 text-secondary font-bold rounded-lg text-xs border border-gray-200 hover:bg-gray-100 transition">View Payslips</button>
+        <button id="withdrawBtn" class="flex-1 py-2.5 bg-secondary text-white font-bold rounded-lg text-xs shadow-lg shadow-secondary/20 hover:bg-opacity-90 transition">Withdraw</button>
+      </div>
+    </div>
+
+    <button id="openDocsBtn" class="w-full bg-white rounded-2xl p-5 shadow-card border border-gray-100 flex items-center justify-between group active:scale-[0.98] transition-transform">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-xl">
+          <i class="fas fa-file-contract" aria-hidden="true"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="font-bold text-secondary text-base">Certificates & Docs</h3>
+          <p class="text-xs text-gray-500 mt-0.5">Manage BOSIET, Passport, Medical</p>
+          <div class="flex gap-1 mt-1.5">
+            <span class="text-[10px] bg-green-100 text-green-700 px-1.5 rounded">2 Valid</span>
+            <span class="text-[10px] bg-red-100 text-red-700 px-1.5 rounded">1 Expired</span>
+          </div>
+        </div>
+      </div>
+      <i class="fas fa-chevron-right text-gray-300 group-hover:text-primary transition" aria-hidden="true"></i>
+    </button>
+
+    <div class="bg-white rounded-2xl p-4 shadow-card border border-gray-100">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-secondary text-base"><i class="fas fa-university text-gray-300 mr-2" aria-hidden="true"></i>Banking</h3>
+        <button id="manageBankingBtn" class="text-primary text-xs font-bold hidden">Manage</button>
+      </div>
+
+      <button id="addBankBtn" class="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-gray-200 rounded-xl hover:bg-gray-50 transition">
+        <i class="fas fa-plus text-primary text-sm"></i>
+        <span class="text-sm font-bold text-primary">Add Bank Account</span>
+      </button>
+
+      <div id="filledBankCard" class="bg-gray-50 rounded-xl p-4 border border-gray-100 flex items-center gap-4 hidden">
+        <div class="w-10 h-10 bg-white rounded-lg shadow-sm flex items-center justify-center text-secondary text-xl">
+          <i class="fas fa-building-columns" aria-hidden="true"></i>
+        </div>
+        <div class="flex-1">
+          <p id="bankNameDisplay" class="text-sm font-bold text-secondary">Maybank Islamic</p>
+          <p id="bankAccountDisplay" class="text-sm font-medium text-gray-500 font-mono">**** 8821</p>
+        </div>
+        <button id="removeBankBtn" class="text-xs text-red-500 font-bold">Remove</button>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-card border border-gray-100">
+      <h3 class="font-bold text-secondary text-base mb-4">Gigs Ecosystem</h3>
+      <div class="grid grid-cols-3 gap-3">
+        <button id="insuranceBtn" class="flex flex-col items-center p-3 rounded-xl bg-blue-50/50 border border-blue-100 hover:bg-blue-50 transition active:scale-95">
+          <div class="w-10 h-10 rounded-full bg-white text-blue-600 shadow-sm flex items-center justify-center mb-2 text-lg"><i class="fas fa-user-shield" aria-hidden="true"></i></div>
+          <span class="text-[12px] font-bold text-secondary leading-tight">Offshore<br>Insurance</span>
+        </button>
+        <button id="referralBtn" class="flex flex-col items-center p-3 rounded-xl bg-teal-50/50 border border-teal-100 hover:bg-teal-50 transition active:scale-95">
+          <div class="w-10 h-10 rounded-full bg-white text-primary shadow-sm flex items-center justify-center mb-2 text-lg"><i class="fas fa-users" aria-hidden="true"></i></div>
+          <span class="text-[12px] font-bold text-secondary leading-tight">Crew<br>Referral</span>
+        </button>
+        <button id="trainingsBtn" class="flex flex-col items-center p-3 rounded-xl bg-orange-50/50 border border-orange-100 hover:bg-orange-50 transition active:scale-95">
+          <div class="w-10 h-10 rounded-full bg-white text-orange-500 shadow-sm flex items-center justify-center mb-2 text-lg"><i class="fas fa-anchor" aria-hidden="true"></i></div>
+          <span class="text-[12px] font-bold text-secondary leading-tight">Offshore<br>Trainings</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 shadow-card border border-gray-100">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-secondary text-base">PPE Purchase</h3>
+        <button id="visitStoreBtn" class="text-primary text-xs font-bold flex items-center">
+          Visit Store <i class="fas fa-chevron-right text-[10px] ml-1" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="bg-gray-50 p-2 rounded-lg border border-gray-100">
+          <p class="text-[10px] text-gray-400 uppercase font-bold">Coverall</p>
+          <p class="text-sm font-bold text-secondary">Size: L</p>
+        </div>
+        <div class="bg-gray-50 p-2 rounded-lg border border-gray-100">
+          <p class="text-[10px] text-gray-400 uppercase font-bold">Boots</p>
+          <p class="text-sm font-bold text-secondary">UK 9</p>
+        </div>
+        <button id="buyKitBtn" class="bg-primary/10 border border-primary/20 p-2 rounded-lg flex items-center justify-center">
+          <span class="text-xs font-bold text-primary">Buy Kit</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-secondary text-white rounded-2xl p-5 shadow-card relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-xl"></div>
+      <h3 class="font-bold text-lg mb-1">Need Help?</h3>
+      <p class="text-xs text-gray-300 mb-4 opacity-80">We are available 24/7 for crew support.</p>
+      <div class="grid grid-cols-2 gap-3">
+        <button id="whatsappBtn" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm p-3 rounded-xl flex items-center gap-3 transition border border-white/10 text-left">
+          <div class="w-8 h-8 rounded-full bg-whatsapp flex items-center justify-center text-white text-sm"><i class="fab fa-whatsapp" aria-hidden="true"></i></div>
+          <div>
+            <p class="text-xs font-bold">WhatsApp</p>
+            <p class="text-[9px] text-gray-300">Fastest response</p>
+          </div>
+        </button>
+        <button id="chatBtn" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm p-3 rounded-xl flex items-center gap-3 transition border border-white/10 text-left">
+          <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm"><i class="fas fa-comment-alt" aria-hidden="true"></i></div>
+          <div>
+            <p class="text-xs font-bold">Live Chat</p>
+            <p class="text-[9px] text-gray-300">In-App Support</p>
+          </div>
+        </button>
+        <button id="emailBtn" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm p-3 rounded-xl flex items-center gap-3 transition border border-white/10 text-left">
+          <div class="w-8 h-8 rounded-full bg-white text-secondary flex items-center justify-center text-sm"><i class="fas fa-envelope" aria-hidden="true"></i></div>
+          <div>
+            <p class="text-xs font-bold">Email Us</p>
+            <p class="text-[9px] text-gray-300">Doc issues</p>
+          </div>
+        </button>
+         <button id="faqBtn" class="bg-white/10 hover:bg-white/20 backdrop-blur-sm p-3 rounded-xl flex items-center gap-3 transition border border-white/1Obsidian text-left">
+          <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white text-sm"><i class="fas fa-question" aria-hidden="true"></i></div>
+          <div>
+            <p class="text-xs font-bold">FAQ</p>
+            <p class="text-[9px] text-gray-300">Common Qs</p>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-1 shadow-card border border-gray-100 overflow-hidden">
+      <div class="divide-y divide-gray-50">
+        <button id="userGuideBtn" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs"><i class="fas fa-book" aria-hidden="true"></i></div>
+            <span class="font-medium text-sm text-gray-700">User Guide</span>
+          </div>
+          <i class="fas fa-chevron-right text-xs text-gray-300" aria-hidden="true"></i>
+        </button>
+        <button id="privacyBtn" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs"><i class="fas fa-shield-halved" aria-hidden="true"></i></div>
+            <span class="font-medium text-sm text-gray-700">Terms & Privacy Policy</span>
+          </div>
+          <i class="fas fa-chevron-right text-xs text-gray-300" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="text-center pb-4">
+      <p class="text-[10px] text-gray-400 uppercase tracking-widest">OffshoreGigs v1.2.3</p>
+      <button id="logoutBtn" class="text-red-500 text-xs font-bold mt-3 py-2 px-6 hover:bg-red-50 rounded-full transition">Log Out</button>
+    </div>
+
+  </main>
+
+  <div id="docModal" class="fixed inset-0 z-[60] flex items-end justify-center" role="dialog" aria-modal="true" aria-labelledby="docModalTitle">
+      <div id="docModalOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div id="docModalContent" class="relative bg-white w-full rounded-t-3xl shadow-modal h-[85vh] flex flex-col">
+          <div id="docModalHandle" class="w-full flex justify-center pt-3 pb-1">
+            <div class="w-12 h-1.5 bg-gray-200 rounded-full"></div>
+          </div>
+          <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
+            <h2 id="docModalTitle" class="text-lg font-bold text-secondary">My Certificates</h2>
+            <button id="docModalCloseBtn" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times" aria-hidden="true"></i></button>
+          </div>
+          <div class="flex px-6 border-b border-gray-100">
+            <button id="tab-personal" class="tab-btn active flex-1 py-3 text-sm text-gray-400 font-medium text-center transition-colors">Personal</button>
+            <button id="tab-offshore" class="tab-btn flex-1 py-3 text-sm text-gray-400 font-medium text-center transition-colors">Offshore</button>
+            <button id="tab-medical" class="tab-btn flex-1 py-3 text-sm text-gray-400 font-medium text-center transition-colors">Medical</button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <div id="content-personal" class="space-y-3">
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fas fa-id-card" aria-hidden="true"></i></div>
+                  <div>
+                    <p class="text-sm font-bold text-secondary">IC / National ID</p>
+                    <p class="text-[10px] text-gray-400">Verified: 901020-10-XXXX</p>
+                  </div>
+                </div>
+                <i class="fas fa-check-circle text-green-500" aria-hidden="true"></i>
+              </div>
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center"><i class="fas fa-passport" aria-hidden="true"></i></div>
+                  <div>
+                    <p class="text-sm font-bold text-secondary">Passport</p>
+                    <p class="text-[10px] text-green-600 font-medium">Exp: 15 Jun 2028</p>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Valid</span>
+              </div>
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center"><i class="fas fa-file-alt" aria-hidden="true"></i></div>
+                  <div>
+                    <p class="text-sm font-bold text-secondary">Latest CV</p>
+                    <p class="text-[10px] text-gray-400">Updated: 2 days ago</p>
+                  </div>
+                </div>
+                <button class="text-xs text-primary font-bold">View</button>
+              </div>
+            </div>
+
+            <div id="content-offshore" class="space-y-3 hidden">
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center"><i class="fas fa-swimmer" aria-hidden="true"></i></div>
+                  <div>
+                    <p class="text-sm font-bold text-secondary">BOSIET (OPITO)</p>
+                    <p class="text-[10px] text-green-600 font-medium">Exp: 12 Dec 2026</p>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Valid</span>
+              </div>
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-yellow-50 text-yellow-600 flex items-center justify-center"><i class="fas fa-skull-crossbones" aria-hidden="true"></i></div>
+                  <div>
+                    <p class="text-sm font-bold text-secondary">H2S Awareness</p>
+                    <p class="text-[10px] text-red-500 font-medium">Exp: 10 Jan 2024</p>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold">Expired</span>
+              </div>
+            </div>
+
+            <div id="content-medical" class="space-y-3 hidden">
+              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-red-50 text-red-500 flex items-center justify-center"><i class="fas fa-user-md" aria-hidden="true"></i></div>
+                  <div>
+                    <p class="text-sm font-bold text-secondary">OGUK Medical</p>
+                    <p class="text-[10px] text-green-600 font-medium">Exp: 15 Aug 2025</p>
+                  </div>
+                </div>
+                <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Fit</span>
+              </div>
+            </div>
+          </div>
+          <div class="p-5 bg-white border-t border-gray-100">
+            <button class="w-full py-3 bg-secondary text-white font-bold rounded-xl shadow-lg shadow-secondary/20 active:scale-95 transition-transform">
+              <i class="fas fa-plus mr-2" aria-hidden="true"></i> Upload New Document
+            </button>
+          </div>
+      </div>
+  </div>
+
+  <div id="bankingModal" class="fixed inset-0 z-[60] flex items-end justify-center" role="dialog" aria-modal="true" aria-labelledby="bankingModalTitle">
+    <div id="bankingModalOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div id="bankingModalContent" class="relative bg-white w-full rounded-t-3xl shadow-modal h-auto flex flex-col"> <div id="bankingModalHandle" class="w-full flex justify-center pt-3 pb-1">
+        <div class="w-12 h-1.5 bg-gray-200 rounded-full"></div>
+      </div>
+      <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
+        <h2 id="bankingModalTitle" class="text-lg font-bold text-secondary">Manage Banking</h2>
+        <button id="bankingModalCloseBtn" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-3">
+        
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+          <p class="text-sm font-bold text-secondary mb-3">Add New Bank Account</p>
+          <form class="space-y-2">
+            <div>
+              <label class="text-xs font-bold text-gray-500">Bank Name</label>
+              <select id="bankNameInput" class="mt-1 w-full bg-gray-50 border border-gray-200 text-xs font-medium rounded-lg px-3 py-2.5 outline-none focus:border-secondary">
+                <option value="" disabled selected>Select a bank...</option>
+                <option value="Maybank">Maybank</option>
+                <option value="CIMB Bank">CIMB Bank</option>
+                <option value="Public Bank">Public Bank</option>
+                <option value="RHB Bank">RHB Bank</option>
+                <option value="Hong Leong Bank">Hong Leong Bank</option>
+                <option value="AmBank">AmBank</option>
+                <option value="Bank Islam">Bank Islam</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-500">Account Number</label>
+              <input id="accountNumberInput" type="number" placeholder="1234..." class="mt-1 w-full bg-gray-50 border border-gray-200 text-xs font-medium rounded-lg px-3 py-2.5 outline-none focus:border-secondary">
+            </div>
+            <div id="bankingModalError" class="text-xs text-red-500 pt-1 hidden"></div>
+          </form>
+        </div>
+      </div>
+      <div class="p-5 bg-white border-t border-gray-100">
+        <button id="saveAccountBtn" class="w-full py-3 bg-secondary text-white font-bold rounded-xl shadow-lg shadow-secondary/20 active:scale-95 transition-transform">
+          <i class="fas fa-plus mr-2" aria-hidden="true"></i> Save New Account
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="payslipModal" class="fixed inset-0 z-[60] flex items-end justify-center" role="dialog" aria-modal="true" aria-labelledby="payslipModalTitle">
+    <div id="payslipModalOverlay" class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+    <div id="payslipModalContent" class="relative bg-white w-full rounded-t-3xl shadow-modal h-[85vh] flex flex-col">
+      <div id="payslipModalHandle" class="w-full flex justify-center pt-3 pb-1">
+        <div class="w-12 h-1.5 bg-gray-200 rounded-full"></div>
+      </div>
+      <div class="px-6 pb-4 border-b border-gray-100 flex justify-between items-center">
+        <h2 id="payslipModalTitle" class="text-lg font-bold text-secondary">My Payslips</h2>
+        <button id="payslipModalCloseBtn" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"><i class="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-3">
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gray-100 text-secondary flex items-center justify-center"><i class="fas fa-file-invoice" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-sm font-bold text-secondary">Gorgon Platform - 28 days</p>
+              <p class="text-xs text-gray-500 font-medium">10 Oct 2025 - RM 2,150.00</p>
+            </div>
+          </div>
+          <button class="download-payslip-btn text-xs text-primary font-bold" data-filename="Payslip_Oct2025.pdf">Download</button>
+        </div>
+        
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gray-100 text-secondary flex items-center justify-center"><i class="fas fa-file-invoice" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-sm font-bold text-secondary">West AcGis - 14 days</p>
+              <p class="text-xs text-gray-500 font-medium">15 Sep 2025 - RM 850.00</p>
+            </div>
+          </div>
+          <button class="download-payslip-btn text-xs text-primary font-bold" data-filename="Payslip_Sep2025.pdf">Download</button>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gray-100 text-secondary flex items-center justify-center"><i class="fas fa-file-invoice" aria-hidden="true"></i></div>
+            <div>
+              <p class="text-sm font-bold text-secondary">Dulang B Shutdown</p>
+              <p class="text-xs text-gray-500 font-medium">2 Aug 2025 - RM 1,250.00</p>
+            </div>
+          </div>
+          <button class="download-payslip-btn text-xs text-primary font-bold" data-filename="Payslip_Aug2025.pdf">Download</button>
+        </div>
+      </div>
+      </div>
+  </div>
+
+
+  <nav class="bottom-nav fixed bottom-0 w-full bg-white border-t border-gray-100 z-50 flex justify-around items-center">
+    <a href="home.html" class="nav-item"><i class="fas fa-briefcase" aria-hidden="true"></i><span>Jobs</span></a>
+    <a href="messages.html" class="nav-item"><i class="fas fa-comments" aria-hidden="true"></i><span>Messages</span></a>
+    <a href="mobilize.html" class="nav-item relative">
+      <div class="w-14 h-14 flex items-center justify-center -mt-6">
+        <img src="https://ik.imagekit.io/f4l5qeepf/Picture1.png?updatedAt=1763021734931"
+             alt="Offshore Rig" class="w-20 h-20 object-contain mx-auto rig-icon"/>
+      </div>
+      <span class="mt-1 text-[10px] font-medium text-gray-400">Mission</span>
+    </a>
+    <a href="orders.html" class="nav-item"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i><span>Orders</span></a>
+    <a href="profile.html" class="nav-item active"><i class="fas fa-user" aria-hidden="true"></i><span>Profile</span></a>
+  </nav>
+
+  <script>
+    // State
+    let isReady = true;
+
+    // --- Function Declarations ---
+
+    function toggleStatus() {
+      isReady = !isReady;
+      const btn = document.getElementById('toggleBtn');
+      const knob = document.getElementById('toggleKnob');
+      const text = document.getElementById('statusText');
+      const desc = document.getElementById('statusDesc');
+      const dateContainer = document.getElementById('returnDateContainer');
+
+      btn.setAttribute('aria-checked', isReady);
+
+      if (isReady) {
+        btn.classList.remove('bg-gray-300'); btn.classList.add('bg-primary');
+        knob.classList.remove('translate-x-0'); knob.classList.add('translate-x-6');
+        text.innerText = "Ready to Mobilize"; text.classList.remove('text-gray-500'); text.classList.add('text-primary');
+        desc.innerText = "You are visible to Oil & Gas recruiters. Keep this active to receive new mission offers.";
+        dateContainer.classList.remove('open');
+      } else {
+        btn.classList.remove('bg-primary'); btn.classList.add('bg-gray-300');
+        knob.classList.remove('translate-x-6'); knob.classList.add('translate-x-0');
+        text.innerText = "Currently Offshore"; text.classList.remove('text-primary'); text.classList.add('text-gray-500');
+        desc.innerText = "Your profile is paused. Recruiters will not see you until you set a return date.";
+        dateContainer.classList.add('open');
+      }
+    }
+
+    // Doc Modal Logic
+    function openDocs() { document.getElementById('docModal').classList.add('open'); }
+    function closeDocs() { document.getElementById('docModal').classList.remove('open'); }
+    
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('content-personal').classList.add('hidden');
+        document.getElementById('content-offshore').classList.add('hidden');
+        document.getElementById('content-medical').classList.add('hidden');
+        
+        document.getElementById('tab-' + tabName).classList.add('active');
+        document.getElementById('content-' + tabName).classList.remove('hidden');
+    }
+
+    // Banking Modal Logic
+    function openBankingModal() { document.getElementById('bankingModal').classList.add('open'); }
+    function closeBankingModal() { 
+      document.getElementById('bankingModal').classList.remove('open'); 
+      document.getElementById('bankingModalError').classList.add('hidden');
+    }
+
+    // Payslip Modal Logic
+    function openPayslipModal() { document.getElementById('payslipModal').classList.add('open'); }
+    function closePayslipModal() { document.getElementById('payslipModal').classList.remove('open'); }
+
+    // IMPROVED: Added logic back to simulateDownload
+    function simulateDownload(event) {
+      const filename = event.target.getAttribute('data-filename');
+      alert('Simulating download...\n' + filename);
+    }
+
+    function simulateSave() {
+      const saveBtn = document.getElementById('saveAccountBtn');
+      const errorEl = document.getElementById('bankingModalError');
+      const bankName = document.getElementById('bankNameInput').value;
+      const accNum = document.getElementById('accountNumberInput').value;
+
+      if (!bankName || !accNum) {
+        errorEl.textContent = 'Please fill in all fields.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+      errorEl.classList.add('hidden');
+      
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
+      saveBtn.disabled = true;
+
+      setTimeout(() => {
+        document.getElementById('bankNameDisplay').textContent = bankName;
+        document.getElementById('bankAccountDisplay').textContent = '**** ' + accNum.slice(-4);
+        
+        document.getElementById('addBankBtn').classList.add('hidden');
+        document.getElementById('filledBankCard').classList.remove('hidden');
+        document.getElementById('manageBankingBtn').classList.remove('hidden');
+
+        saveBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Account Saved!';
+        saveBtn.classList.remove('bg-secondary');
+        saveBtn.classList.add('bg-green-500');
+
+        setTimeout(() => {
+          closeBankingModal();
+          saveBtn.innerHTML = '<i class="fas fa-plus mr-2"></i> Save New Account';
+          saveBtn.classList.remove('bg-green-500');
+          saveBtn.classList.add('bg-secondary');
+          saveBtn.disabled = false;
+        }, 1500);
+
+      }, 2000);
+    }
+
+    function removeBank() {
+      document.getElementById('addBankBtn').classList.remove('hidden');
+      document.getElementById('filledBankCard').classList.add('hidden');
+      document.getElementById('manageBankingBtn').classList.add('hidden');
+      document.getElementById('bankNameInput').value = "";
+      document.getElementById('accountNumberInput').value = "";
+    }
+
+    function simulateLogout() {
+      const logoutBtn = document.getElementById('logoutBtn');
+      logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Logging out...';
+      logoutBtn.disabled = true;
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    }
+
+
+    // --- Event Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // Status Toggle
+      document.getElementById('toggleBtn').addEventListener('click', toggleStatus);
+      document.getElementById('setReturnDateBtn').addEventListener('click', () => {
+        document.getElementById('returnDateContainer').classList.remove('open');
+      });
+
+      // Doc Modal
+      document.getElementById('openDocsBtn').addEventListener('click', openDocs);
+      document.getElementById('docModalOverlay').addEventListener('click', closeDocs);
+      document.getElementById('docModalHandle').addEventListener('click', closeDocs);
+      document.getElementById('docModalCloseBtn').addEventListener('click', closeDocs);
+      
+      // Doc Modal Tabs
+      document.getElementById('tab-personal').addEventListener('click', () => switchTab('personal'));
+      document.getElementById('tab-offshore').addEventListener('click', () => switchTab('offshore'));
+      document.getElementById('tab-medical').addEventListener('click', () => switchTab('medical'));
+
+      // Banking Listeners
+      document.getElementById('manageBankingBtn').addEventListener('click', openBankingModal);
+      document.getElementById('addBankBtn').addEventListener('click', openBankingModal);
+      document.getElementById('removeBankBtn').addEventListener('click', removeBank);
+      
+      document.getElementById('bankingModalOverlay').addEventListener('click', closeBankingModal);
+      document.getElementById('bankingModalHandle').addEventListener('click', closeBankingModal);
+      document.getElementById('bankingModalCloseBtn').addEventListener('click', closeBankingModal);
+      document.getElementById('saveAccountBtn').addEventListener('click', simulateSave);
+      
+
+      // Payslip Modal
+      document.getElementById('viewPayslipsBtn').addEventListener('click', openPayslipModal);
+      document.getElementById('payslipModalOverlay').addEventListener('click', closePayslipModal);
+      document.getElementById('payslipModalHandle').addEventListener('click', closePayslipModal);
+      document.getElementById('payslipModalCloseBtn').addEventListener('click', closePayslipModal);
+      
+      // IMPROVED: Added listener for download buttons
+      document.querySelectorAll('.download-payslip-btn').forEach(btn => {
+        btn.addEventListener('click', simulateDownload);
+      });
+
+      // Logout Button
+      document.getElementById('logoutBtn').addEventListener('click', simulateLogout);
+
+      // All Other Demo Buttons
+      document.getElementById('settingsBtn').addEventListener('click', () => alert("Settings page not available in this demo."));
+      document.getElementById('withdrawBtn').addEventListener('click', () => alert("Withdrawal flow not available in this demo."));
+      document.getElementById('insuranceBtn').addEventListener('click', () => alert("Insurance partners page not available in this demo."));
+      document.getElementById('referralBtn').addEventListener('click', () => alert("Referral program details not available in this demo."));
+      document.getElementById('trainingsBtn').addEventListener('click', () => alert("Training portal not available in this demo."));
+      document.getElementById('visitStoreBtn').addEventListener('click', () => alert("PPE Store not available in this demo."));
+      document.getElementById('buyKitBtn').addEventListener('click', () => alert("PPE Store not available in this demo."));
+      document.getElementById('whatsappBtn').addEventListener('click', () => alert("This would open a WhatsApp chat."));
+      document.getElementById('chatBtn').addEventListener('click', () => alert("This would open the in-app support chat."));
+      document.getElementById('emailBtn').addEventListener('click', () => alert("This would open your email client."));
+      document.getElementById('faqBtn').addEventListener('click', () => alert("This would open the FAQ page."));
+      document.getElementById('userGuideBtn').addEventListener('click', () => alert("This would open the User Guide."));
+      document.getElementById('privacyBtn').addEventListener('click', () => alert("This would open the Terms & Privacy document."));
+
+    });
+  </script>
+</body>
+</html>
